@@ -1,4 +1,5 @@
 # Blue Harvest EKS Cluster
+[![Build Status](https://travis-ci.org/cagingulsen/kubernetes-eks-cluster.svg?branch=master)](https://travis-ci.org/cagingulsen/kubernetes-eks-cluster)
 
 This repository contains terraform code to provision a fully operational EKS Kubernetes cluster.
 ## User Guide
