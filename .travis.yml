@@ -1,8 +1,31 @@
+language: generic
+
+env:
+  - TERRAFORM_VERSION=0.11.11
+services:
+  - docker
+sudo: required
+
+before_script:
+  # Build docker image
+  - wget https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+  - unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+  - sudo mv terraform /usr/local/bin/
+  - curl -LO https://amazon-eks.s3-us-west-2.amazonaws.com/1.10.3/2018-07-26/bin/linux/amd64/aws-iam-authenticator && mv aws-iam-authenticator /usr/bin/aws-iam-authenticator && chmod +x /usr/bin/aws-iam-authenticator
+  - curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl && mv kubectl /usr/bin/kubectl && chmod +x /usr/bin/kubectl
+  - curl -L https://storage.googleapis.com/kubernetes-helm/helm-v2.12.3-linux-amd64.tar.gz | tar xvz && mv linux-amd64/helm /usr/bin/helm && chmod +x /usr/bin/helm
+  - terraform init -force-copy=true
+
 jobs:
   include:
-  - stage: build
-    script: echo one
-  - stage: deploy
-    script: echo two
-  - stage: undeploy
-    script: echo three
+    - stage: build
+      script:
+        - terraform validate
+        - terraform plan
+    - stage: deploy
+      script:
+        - terraform apply -input=false -auto-approve=true
+        - terraform plan
+
+after_script:
+  - terraform destroy --force
