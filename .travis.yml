@@ -6,11 +6,12 @@ env:
 services:
   - docker
 
-before_script:
+script:
   # Build docker image
   - wget https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip
   - unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip
   - sudo mv terraform /usr/local/bin/
+  - rm terraform_${TERRAFORM_VERSION}_linux_amd64.zip
   - sudo curl -LO https://amazon-eks.s3-us-west-2.amazonaws.com/1.10.3/2018-07-26/bin/linux/amd64/aws-iam-authenticator
   - sudo mv aws-iam-authenticator /usr/bin/aws-iam-authenticator
   - sudo chmod +x /usr/bin/aws-iam-authenticator
@@ -18,17 +19,8 @@ before_script:
   - sudo mv kubectl /usr/bin/kubectl && chmod +x /usr/bin/kubectl
   - sudo curl -L https://storage.googleapis.com/kubernetes-helm/helm-v2.12.3-linux-amd64.tar.gz | tar xvz && mv linux-amd64/helm /usr/bin/helm && chmod +x /usr/bin/helm
   - terraform init -force-copy=true
-
-jobs:
-  include:
-    - stage: build
-      script:
-        - terraform validate
-        - terraform plan
-    - stage: deploy
-      script:
-        - terraform apply -input=false -auto-approve=true
-        - terraform plan
-
-after_script:
+  - terraform validate
+  - terraform plan
+  - terraform apply -input=false -auto-approve=true
+  - terraform plan
   - terraform destroy --force
