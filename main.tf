@@ -12,8 +12,8 @@ terraform {
 }
 
 module "blueharvest-eks" {
-  //source              = "s3::https://s3-eu-west-1.amazonaws.com/blueharvest-terraform-registry/terraform-aws-blueharvest-eks.zip"
-  source              = "../terraform-aws-blueharvest-eks"
+  source              = "s3::https://s3-eu-west-1.amazonaws.com/blueharvest-terraform-registry/terraform-aws-blueharvest-eks-v0.0.4-release.zip"
+  // source              = "../terraform-aws-blueharvest-eks"
   availability_zones  = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
   eks_ami_id          = "ami-01e08d22b9439c15a" //amazon-eks-node-1.11-v20190109
   instance_type       = "t2.large"
