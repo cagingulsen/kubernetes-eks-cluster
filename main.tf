@@ -7,7 +7,7 @@ terraform {
     encrypt = true
     bucket  = "blueharvest-terraform-state-storage-s3"
     region  = "eu-west-1"
-    key     = "blueharvest/terraform/eks/travisTest"
+    key     = "blueharvest/terraform/eks/travistest"
   }
 }
 
@@ -18,7 +18,7 @@ module "blueharvest-eks" {
   instance_type          = "t3.large"
   asg_min_size           = "5"
   asg_max_size           = "20"
-  cluster_name           = "travisTest"
+  cluster_name           = "travistest"
   cluster_zone           = "blueharvest.io"
   cluster_zone_id        = "Z31OVNF5EA1VAW"
   letsencrypt_email      = "kemal.gulsen@capgemini.com"
