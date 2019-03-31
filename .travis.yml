@@ -1,5 +1,5 @@
 language: generic
-sudo: required
+sudo: true
 
 env:
   - TERRAFORM_VERSION=0.11.11
@@ -16,9 +16,11 @@ script:
   - sudo mv aws-iam-authenticator /usr/bin/aws-iam-authenticator
   - sudo chmod +x /usr/bin/aws-iam-authenticator
   - sudo curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
-  - sudo mv kubectl /usr/bin/kubectl && chmod +x /usr/bin/kubectl
+  - sudo mv kubectl /usr/bin/kubectl
+  - sudo chmod +x /usr/bin/kubectl
   - sudo curl -L https://storage.googleapis.com/kubernetes-helm/helm-v2.12.3-linux-amd64.tar.gz | tar xvz
-  - sudo mv linux-amd64/helm /usr/bin/helm && chmod +x /usr/bin/helm
+  - sudo mv linux-amd64/helm /usr/bin/helm
+  - sudo chmod +x /usr/bin/helm
   - terraform init -force-copy=true
   - terraform validate
   - terraform plan
