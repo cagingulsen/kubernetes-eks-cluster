@@ -5,7 +5,7 @@ env:
   global:
     - TERRAFORM_VERSION=0.11.11
     - SHOULD_DEPLOY=false
-    - SHOULD_DESTROY=true
+    - SHOULD_DESTROY=false
 services:
   - docker
 
