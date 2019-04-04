@@ -5,6 +5,7 @@ env:
   global:
     - TERRAFORM_VERSION=0.11.11
     - SHOULD_DEPLOY=false
+    - SHOULD_DESTROY=false
 services:
   - docker
 
@@ -36,5 +37,7 @@ jobs:
     script:
       - terraform apply -input=false -auto-approve=true
       - terraform plan
-    after_script:
+  - stage: destroy
+    if: SHOULD_DESTROY = true
+    script:
       - terraform destroy --force
