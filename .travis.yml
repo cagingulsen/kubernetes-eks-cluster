@@ -37,6 +37,18 @@ jobs:
     script:
       - terraform apply -input=false -auto-approve=true
       - terraform plan
+    deploy:
+      provider: releases
+      api_key: "GITHUB OAUTH TOKEN"
+      file:
+        - kubeconfig_*
+        - config-map-aws-auth_*.yaml
+        - ./*.ovpn
+        - ./*_key
+        - ./*_key.pub
+      skip_cleanup: true
+      on:
+        tags: true
   - stage: destroy
     if: SHOULD_DESTROY = true
     script:
