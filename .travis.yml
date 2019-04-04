@@ -3,7 +3,7 @@ sudo: true
 
 env:
   - TERRAFORM_VERSION=0.11.11
-  -
+  - SHOULD_DEPLOY=false
 services:
   - docker
 
@@ -31,6 +31,7 @@ jobs:
       - terraform validate
       - terraform plan
   - stage: deploy
+    if: SHOULD_DEPLOY = true
     script:
       - terraform apply -input=false -auto-approve=true
       - terraform plan
