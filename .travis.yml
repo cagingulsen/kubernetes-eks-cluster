@@ -6,7 +6,7 @@ env:
 services:
   - docker
 
-script:
+install:
   # Build docker image
   - wget https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip
   - unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip
@@ -22,8 +22,17 @@ script:
   - sudo mv linux-amd64/helm /usr/bin/helm
   - sudo chmod +x /usr/bin/helm
   - terraform init -force-copy=true
-  - terraform validate
-  - terraform plan
-  - terraform apply -input=false -auto-approve=true
-  - terraform plan
+
+jobs:
+  include:
+  - stage: build
+    script:
+      - terraform validate
+      - terraform plan
+  - stage: deploy
+    script:
+      - terraform apply -input=false -auto-approve=true
+      - terraform plan
+
+after_script:
   - terraform destroy --force
