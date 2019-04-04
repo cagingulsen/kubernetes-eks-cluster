@@ -33,7 +33,7 @@ jobs:
       - terraform validate
       - terraform plan
   - stage: deploy
-    if: SHOULD_DEPLOY = true
+    if: env(SHOULD_DEPLOY) = true
     script:
       - terraform apply -input=false -auto-approve=true
       - terraform plan
@@ -50,6 +50,6 @@ jobs:
       on:
         tags: true
   - stage: destroy
-    if: SHOULD_DESTROY = true
+    if: env(SHOULD_DESTROY) = true
     script:
       - terraform destroy --force
