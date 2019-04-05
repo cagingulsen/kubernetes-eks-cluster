@@ -47,8 +47,6 @@ jobs:
         - ./*_key
         - ./*_key.pub
       skip_cleanup: true
-      on:
-        tags: true
   - stage: destroy
     if: env(SHOULD_DESTROY) = true
     script:
