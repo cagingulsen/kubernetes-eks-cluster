@@ -8,8 +8,6 @@ env:
     - SHOULD_DESTROY=false
 services:
   - docker
-cache:
-  timeout: 3600
 
 install:
   # Build docker image
@@ -35,21 +33,7 @@ jobs:
       - terraform validate
       - terraform plan
   - stage: deploy
-    if: env(SHOULD_DEPLOY) = true
     script:
       - terraform apply -input=false -auto-approve=true
       - terraform plan
-    deploy:
-      provider: releases
-      api_key: "GITHUB OAUTH TOKEN"
-      file:
-        - kubeconfig_*
-        - config-map-aws-auth_*.yaml
-        - ./*.ovpn
-        - ./*_key
-        - ./*_key.pub
-      skip_cleanup: true
-  - stage: destroy
-    if: env(SHOULD_DESTROY) = true
-    script:
       - terraform destroy --force
