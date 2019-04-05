@@ -9,31 +9,44 @@ env:
 services:
   - docker
 
-install:
-  # Build docker image
-  - wget https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip
-  - unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip
-  - sudo mv terraform /usr/local/bin/
-  - rm terraform_${TERRAFORM_VERSION}_linux_amd64.zip
-  - sudo curl -LO https://amazon-eks.s3-us-west-2.amazonaws.com/1.10.3/2018-07-26/bin/linux/amd64/aws-iam-authenticator
-  - sudo mv aws-iam-authenticator /usr/bin/aws-iam-authenticator
-  - sudo chmod +x /usr/bin/aws-iam-authenticator
-  - sudo curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
-  - sudo mv kubectl /usr/bin/kubectl
-  - sudo chmod +x /usr/bin/kubectl
-  - sudo curl -L https://storage.googleapis.com/kubernetes-helm/helm-v2.12.3-linux-amd64.tar.gz | tar xvz
-  - sudo mv linux-amd64/helm /usr/bin/helm
-  - sudo chmod +x /usr/bin/helm
-  - terraform init -force-copy=true
-
 jobs:
   include:
   - stage: build
+    install:
+      # Build docker image
+      - wget https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+      - unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+      - sudo mv terraform /usr/local/bin/
+      - rm terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+      - sudo curl -LO https://amazon-eks.s3-us-west-2.amazonaws.com/1.10.3/2018-07-26/bin/linux/amd64/aws-iam-authenticator
+      - sudo mv aws-iam-authenticator /usr/bin/aws-iam-authenticator
+      - sudo chmod +x /usr/bin/aws-iam-authenticator
+      - sudo curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+      - sudo mv kubectl /usr/bin/kubectl
+      - sudo chmod +x /usr/bin/kubectl
+      - sudo curl -L https://storage.googleapis.com/kubernetes-helm/helm-v2.12.3-linux-amd64.tar.gz | tar xvz
+      - sudo mv linux-amd64/helm /usr/bin/helm
+      - sudo chmod +x /usr/bin/helm
+      - terraform init -force-copy=true
     script:
       - terraform validate
       - terraform plan
   - stage: deploy
+    if: env(SHOULD_DEPLOY) = true
     script:
       - terraform apply -input=false -auto-approve=true
       - terraform plan
+    deploy:
+      provider: releases
+      api_key: $GITHUB_OAUTH_TOKEN
+      file:
+        - kubeconfig_*
+        - config-map-aws-auth_*.yaml
+        - ./*.ovpn
+        - ./*_key
+        - ./*_key.pub
+      skip_cleanup: true
+  - stage: destroy
+    if: env(SHOULD_DESTROY) = true
+    script:
       - terraform destroy --force
