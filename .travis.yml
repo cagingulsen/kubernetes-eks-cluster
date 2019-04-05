@@ -29,6 +29,7 @@ install:
 jobs:
   include:
   - stage: build
+    if: env(SHOULD_DEPLOY) = false AND env(SHOULD_DESTROY) = false
     script:
       - terraform validate
       - terraform plan
@@ -50,6 +51,4 @@ jobs:
   - stage: destroy
     if: env(SHOULD_DESTROY) = true
     script:
-      - terraform apply -input=false -auto-approve=true
-      - terraform plan
       - terraform destroy --force
