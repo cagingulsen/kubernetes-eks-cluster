@@ -8,6 +8,8 @@ env:
     - SHOULD_DESTROY=false
 services:
   - docker
+cache:
+  timeout: 3600
 
 install:
   # Build docker image
@@ -47,7 +49,6 @@ jobs:
         - ./*_key
         - ./*_key.pub
       skip_cleanup: true
-    after_failure: skip
   - stage: destroy
     if: env(SHOULD_DESTROY) = true
     script:
