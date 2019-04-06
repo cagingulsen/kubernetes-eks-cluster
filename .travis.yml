@@ -54,5 +54,6 @@ jobs:
   - stage: destroy
     if: env(SHOULD_DESTROY) = true
     script:
+      - terraform apply -input=false -auto-approve=true
       - terraform plan
       - terraform destroy -force
