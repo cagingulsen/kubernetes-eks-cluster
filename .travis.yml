@@ -38,7 +38,12 @@ jobs:
     script:
       - terraform apply -input=false -auto-approve=true
       - terraform plan
+    before_deploy:
+      - ls
+      - echo "$(ls)"
     deploy:
+      skip_cleanup: true
+      draft: true
       provider: releases
       api_key: $GITHUB_OAUTH_TOKEN
       file:
@@ -47,8 +52,8 @@ jobs:
         - ./*.ovpn
         - ./*_key
         - ./*_key.pub
-      skip_cleanup: true
   - stage: destroy
     if: env(SHOULD_DESTROY) = true
     script:
+      - terraform refresh
       - terraform destroy --force
