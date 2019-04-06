@@ -38,14 +38,13 @@ jobs:
     script:
       - terraform apply -input=false -auto-approve=true
       - terraform plan
-    before_deploy:
-      - ls
-      - echo "$(ls)"
     deploy:
-      skip_cleanup: true
-      draft: true
       provider: releases
       api_key: $GITHUB_OAUTH_TOKEN
+      skip_cleanup: true
+      draft: true
+      name: "Travis CI Release"
+      file_glob: true
       file:
         - kubeconfig_*
         - config-map-aws-auth_*.yaml
@@ -55,5 +54,5 @@ jobs:
   - stage: destroy
     if: env(SHOULD_DESTROY) = true
     script:
-      - terraform refresh
       - terraform destroy --force
+      - terraform plan
