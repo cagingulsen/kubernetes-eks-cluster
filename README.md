@@ -3,23 +3,66 @@
 
 This repository contains terraform code to provision a fully operational EKS Kubernetes cluster.
 ## User Guide
+### Travis Configuration
 
-This guide assumes you have the source code hosted on GitLab, and that you have the required secrets defined in
-your GitLab CI/CD environment variables section.
+- Developer should give access to Travis CI for accessing Github.
+- Developer should create an AWS account with Access Key ID and Secret Access Key (by giving only required permissions to the new AWS Account).
+- Developer should create Github OAuth Token. Github → Settings → Developer settings → Personal access tokens → Generate Token. Name your token and pick "repo Full control of private repositories" scope.
+- Environment variables should be set in Travis CI → Project → Settings → Environment Variables. Here are the needed variables:
+    - AWS_ACCESS_KEY_ID
+    - AWS_DEFAULT_REGION
+    - AWS_SECRET_ACCESS_KEY
+    - GITHUB_OAUTH_TOKEN
+- You can check your builds on the website [https://travis-ci.org/GITHUBACCOUNTNAME/kubernetes-eks-cluster](https://travis-ci.org/cagingulsen/kubernetes-eks-cluster)
 
-The required variables are:
+#### Triggers
 
-* AWS_ACCESS_KEY_ID: Same variable used with AWS CLI
-* AWS_SECRET_ACCESS_KEY: Same variable used with AWS CLI
-* AWS_DEFAULT_REGION: Same variable used  with AWS CLI
+- Build Stage: Automated, it gets triggered from Github commits.
+- Deploy Stage: Manual, you need to go to project page in Travis website, then click "More options", then click "Trigger build". Fill CUSTOM CONFIG part with the following:
 
-To create your own cluster you must go to the Gitlab GUI, in particular to the CI/CD section of this repostiroy, and click on the Run pipeline button.
+        env:
+          global:
+            - TERRAFORM_VERSION=0.11.11
+            - SHOULD_DEPLOY=true
+            - SHOULD_DESTROY=false
 
-Once the cluster is created, you will need to download the kubeconfig and .ovpn configuration files by clicking on the followig button:
+    and click "Trigger custom build". Then you can check your deployment from logs.
 
-***
-![Download Artifacts](./assets/download_artifacts.png)
-***
+    If deployment is successful, you can download artifacts from [https://github.com/GITHUBACCOUNTNAME/kubernetes-eks-cluster/releases](https://github.com/cagingulsen/kubernetes-eks-cluster/releases)
+
+    ***WARNING***:
+
+    If the repository is public, exposing artifacts (when Cluster is online) is not secure. 
+
+- Destroy Stage: Manual, like Deploy Stage, you need to go to project page in Travis website, then click "More options", then click "Trigger build". Fill CUSTOM CONFIG part with the following:
+
+        env:
+          global:
+            - TERRAFORM_VERSION=0.11.11
+            - SHOULD_DEPLOY=false
+            - SHOULD_DESTROY=true
+
+    and click "Trigger custom build". Then you can check your destroy from logs. If something unexpected happens, trigger the stage again or go to AWS Console and destroy leftovers manually.
+
+#### Issues
+
+1) For Destroy Stage, instead of:
+
+```
+- terraform destroy -force
+```
+
+I had to use:
+
+```
+- terraform apply -input=false -auto-approve=true
+- terraform plan
+- terraform destroy -force
+```
+
+Open to suggestions.
+
+### Kubernetes Guide
 
 Inside the configuration.zip file, we will find a file named kubeconfig_$CLUSTER_NAME and another file called $CLUSTER_NAME.ovpn
 
